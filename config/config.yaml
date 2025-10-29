@@ -1,0 +1,135 @@
+# Georgian Attractions Enrichment Pipeline Configuration
+# Data sources and storage
+data:
+  # Data source :
+  #   - HuggingFace dataset: "AIAnastasia/Georgian-attractions"
+  #   - Local
+  source: "AIAnastasia/Georgian-attractions"
+
+  # Cache directory for downloaded models and datasets
+  cache_dir: "./data/cache"
+
+  # Output directory for enriched results
+  output_dir: "./data/processed"
+
+# Data validation rules
+validation:
+  # Required fields that must be present
+  required_fields:
+    - name_ru
+    - name_en
+    - description_ru
+    - description_en
+
+  # Check for empty values in required fields
+  check_empty_values: true
+
+# NER (Named Entity Recognition) models
+ner_en:
+  model: "dslim/bert-base-NER"
+  aggregation_strategy: "simple"
+  device: -1  # -1 for CPU, 0 for GPU, 1 for GPU:1, etc.
+
+ner_ru:
+  model: "DeepPavlov/bert-base-cased-conversational"
+  aggregation_strategy: "simple"
+  device: -1
+
+# Zero-shot classification model (for categories and tags)
+zero_shot:
+  model: "joeddav/xlm-roberta-large-xnli"
+  device: -1
+  batch_size: 32
+  hypothesis_template: "This example is about {}."
+
+# Category classification
+categories:
+  en:
+    - nature
+    - history
+    - culture
+    - spirituality
+    - architecture
+
+  ru:
+    - природа
+    - история
+    - культура
+    - духовность
+    - архитектура
+
+# Tag generation
+tags:
+  en:
+    - fortress
+    - bridge
+    - church
+    - waterfall
+    - lake
+    - monastery
+    - mountain
+    - museum
+    - river
+    - national park
+    - gallery
+    - beach
+    - park
+    - castle
+    - garden
+    - reservoir
+    - cave
+    - canyon
+    - forest
+
+  ru:
+    - крепость
+    - мост
+    - церковь
+    - водопад
+    - озеро
+    - монастырь
+    - гора
+    - музей
+    - река
+    - национальный парк
+    - галерея
+    - пляж
+    - парк
+    - замок
+    - сад
+    - водохранилище
+    - пещера
+    - каньон
+    - лес
+
+  # Number of top tags to return per attraction
+  top_k: 5
+
+# Fuzzy matching configuration
+fuzzy_threshold: 65  # Minimum score (0-100) to consider a match
+
+# Weights for fuzzy matching algorithms
+weights:
+  ratio: 0.4        # Exact character matching
+  token_set: 0.5    # Word-based matching
+  partial: 0.1      # Substring matching
+
+# Confidence thresholds for fuzzy matching
+high_confidence: 90           # Scores >= 90 are high confidence
+manual_review_threshold: 70   # Scores 70-89 need manual review
+
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Performance settings
+performance:
+  # Enable progress bars
+  show_progress: true
+
+  # Batch size for processing (if applicable)
+  batch_size: 32
+
+  # Number of workers for parallel processing (0 = auto)
+  num_workers: 0
